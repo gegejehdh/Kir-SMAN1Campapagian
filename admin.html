@@ -90,7 +90,20 @@ table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px}td,
 .cr:active{cursor:grabbing}.cr canvas{position:absolute;left:0;top:0;max-width:none;pointer-events:none}
 .cr::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(#fff7,#fff7) 33.33% 0/1px 100% no-repeat,linear-gradient(#fff7,#fff7) 66.66% 0/1px 100% no-repeat,linear-gradient(#fff7,#fff7) 0 33.33%/100% 1px no-repeat,linear-gradient(#fff7,#fff7) 0 66.66%/100% 1px no-repeat}
 .crc{display:flex;gap:.7rem;align-items:center;margin:.9rem 0;color:var(--m)}.crc input{flex:1;padding:0;border:0;background:none}
-</style><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet"></head><body><main id="a"><div class="sec mut">Memuat…</div></main><div id="toast" class="toast"></div>
+
+/* ===== gaya lembut & pil (selaras dengan situs publik) ===== */
+body{font-family:"Plus Jakarta Sans",Nunito,system-ui,sans-serif;background:radial-gradient(900px 520px at 100% -5%,#fff0d2 0%,transparent 60%),radial-gradient(900px 620px at -10% 8%,#e1eeff 0%,transparent 62%),#f7faff;background-attachment:fixed}
+h1,h2,h3,.btn,th,.tb,.atop .ttl,.mav,.dgrid b{font-family:"Plus Jakarta Sans",Poppins,sans-serif}
+.btn{border-radius:999px;background:linear-gradient(135deg,#0e4aa6,#0a7fd1);box-shadow:0 8px 18px rgba(14,74,166,.24)}.btn:hover{background:linear-gradient(135deg,#0c3f8f,#0870bb)}
+.btn.ghost{background:#fff;border:2px solid #0e4aa6;color:#0e4aa6!important;box-shadow:none}.btn.ghost:hover{background:#f0f6ff;color:#0e4aa6!important}
+.btn.red{background:linear-gradient(135deg,#c41e2c,#e0212f);box-shadow:0 6px 14px rgba(224,33,47,.25)}
+.card{border-radius:20px;border:1px solid #e6eefb;box-shadow:0 8px 26px rgba(31,86,214,.07)}
+.atop{border-top:0;border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#9fd0f5,#f2cf7c 50%,#9fd0f5) 1}
+.adm aside a{border-radius:12px;font-weight:600}.adm aside a.on{background:#eaf3ff;color:#0e4aa6}
+.tb.on{background:#0e4aa6;border-color:#0e4aa6}
+input,select,textarea{border-radius:14px;border:1.5px solid #d5e0f4}
+h2{font-weight:800}
+</style><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></head><body><main id="a"><div class="sec mut">Memuat…</div></main><div id="toast" class="toast"></div>
 <script type="module">
 const $=s=>document.querySelector(s),A=$("#a"),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const toast=(t,e)=>{const x=$("#toast");x.textContent=t;x.className="toast show"+(e?" err":"");setTimeout(()=>x.className="toast",2600)};
