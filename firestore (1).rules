@@ -1,0 +1,76 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin = pengguna yang sudah login (Firebase Authentication).
+    // Pastikan hanya akun admin yang dibuat di Authentication → Users.
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // Pengaturan situs (visi, misi, logo, status pendaftaran, dll.)
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Konten yang tampil di situs publik
+    match /activities/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /gallery/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /team/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Pendaftaran anggota: pengunjung boleh mengirim, hanya admin yang membaca/mengubah/menghapus
+    match /members/{id} {
+      allow create: if request.resource.data.size() <= 15;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Kritik, saran, dan pesan: pengunjung boleh mengirim, hanya admin yang membaca/menghapus
+    match /feedback/{id} {
+      allow create: if request.resource.data.size() <= 15;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Hasil kuis
+    match /quiz_results/{id} {
+      // Peserta menulis hasilnya sendiri (data dicek bentuk dan batasnya)
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.name.size() >= 1
+                    && request.resource.data.name.size() <= 80
+                    && request.resource.data.score is number
+                    && request.resource.data.score >= 0
+                    && request.resource.data.score <= 100
+                    && request.resource.data.status in ['berjalan', 'selesai', 'dihentikan']
+                    && request.resource.data.size() <= 20;
+
+      // Hanya boleh diperbarui selagi kuis masih berjalan.
+      // Setelah selesai/dihentikan, hasil terkunci dan tidak bisa diubah peserta.
+      allow update: if resource.data.status == 'berjalan'
+                    && request.resource.data.id == resource.data.id
+                    && request.resource.data.name == resource.data.name
+                    && request.resource.data.score is number
+                    && request.resource.data.score >= 0
+                    && request.resource.data.score <= 100
+                    && request.resource.data.status in ['berjalan', 'selesai', 'dihentikan']
+                    && request.resource.data.size() <= 20;
+
+      // Hanya admin yang membaca dan menghapus
+      allow read, delete: if isAdmin();
+    }
+
+    // Selain yang di atas, semua ditolak
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
