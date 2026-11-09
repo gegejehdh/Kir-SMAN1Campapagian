@@ -1,0 +1,73 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin = pengguna yang sudah login (Firebase Authentication).
+    // Nonaktifkan pendaftaran akun baru; buat akun admin hanya di Authentication → Users.
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // ---------- Konten publik ----------
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /activities/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /gallery/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /team/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---------- Pendaftaran & pesan ----------
+    match /members/{id} {
+      allow create: if request.resource.data.size() <= 15;
+      allow read, update, delete: if isAdmin();
+    }
+    match /feedback/{id} {
+      allow create: if request.resource.data.size() <= 15;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ---------- Hasil kuis ----------
+    // Bentuk data yang sah (sama persis dengan yang dikirim halaman kuis).
+    function validQuiz(d) {
+      return d.id is string
+          && d.name is string && d.name.size() >= 1 && d.name.size() <= 80
+          && d.total is number && d.total >= 1 && d.total <= 50
+          && d.answered is number && d.answered >= 0 && d.answered <= d.total
+          && d.correct is number && d.correct >= 0 && d.correct <= d.total
+          && d.score is number && d.score >= 0 && d.score <= 100
+          && d.status in ['berjalan', 'selesai', 'dihentikan']
+          && d.size() <= 25;
+    }
+
+    match /quiz_results/{id} {
+      // Peserta membuat dokumen miliknya; id dokumen harus sama dengan field id.
+      allow create: if validQuiz(request.resource.data)
+                    && request.resource.data.id == id;
+
+      // Boleh diperbarui hanya selagi 'berjalan'. Setelah 'selesai'/'dihentikan' terkunci.
+      allow update: if resource.data.status == 'berjalan'
+                    && validQuiz(request.resource.data)
+                    && request.resource.data.id == resource.data.id
+                    && request.resource.data.name == resource.data.name;
+
+      // Hanya admin yang membaca, menghapus.
+      allow read, delete: if isAdmin();
+    }
+
+    // Selain di atas, semua ditolak.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
